@@ -5,38 +5,51 @@
 #define TAM_ACAO 50
 
 typedef struct {
-    char acoes[MAX][TAM_ACAO];
+    char itens[MAX][TAM_ACAO];
     int topo;
-} PilhaAcoes;
+} PilhaStr;
 
-void adicionar_acao(PilhaAcoes *p, const char *acao) {
-    if (p->topo < MAX - 1) {
-        strcpy(p->acoes[++p->topo], acao);
-        printf("Ação adicionada: %s\n", acao);
-    }
+void inicializarPilha(PilhaStr *p) {
+    p->topo = -1;
 }
 
-void desfazer_acao(PilhaAcoes *p) {
-    if (p->topo < 0) {
-        printf("Nenhuma ação para desfazer.\n");
+int estaVazia(PilhaStr *p) {
+    return (p->topo == -1);
+}
+
+int estaCheia(PilhaStr *p) {
+    return (p->topo == MAX - 1);
+}
+
+void push(PilhaStr *p, const char *valor) {
+    if (estaCheia(p)) return;
+    strcpy(p->itens[++p->topo], valor);
+}
+
+void pop(PilhaStr *p, char *dest) {
+    if (estaVazia(p)) {
+        dest[0] = '\0';
         return;
     }
-    printf("Ação desfeita: %s\n", p->acoes[p->topo--]);
+    strcpy(dest, p->itens[p->topo--]);
 }
 
-void listar_acoes(PilhaAcoes *p) {
+void listar(PilhaStr *p) {
     printf("Ações realizadas:\n");
     for (int i = 0; i <= p->topo; i++) {
-        printf("%d: %s\n", i+1, p->acoes[i]);
+        printf("%d: %s\n", i+1, p->itens[i]);
     }
 }
 
 int main() {
-    PilhaAcoes editor = {.topo = -1};
-    adicionar_acao(&editor, "Escreveu 'Olá'");
-    adicionar_acao(&editor, "Escreveu 'Mundo'");
-    listar_acoes(&editor);
-    desfazer_acao(&editor);
-    listar_acoes(&editor);
+    PilhaStr pilha;
+    inicializarPilha(&pilha);
+    push(&pilha, "Escreveu 'Olá'");
+    push(&pilha, "Escreveu 'Mundo'");
+    listar(&pilha);
+    char acao[TAM_ACAO];
+    pop(&pilha, acao);
+    if (acao[0] != '\0') printf("Ação desfeita: %s\n", acao);
+    listar(&pilha);
     return 0;
 }

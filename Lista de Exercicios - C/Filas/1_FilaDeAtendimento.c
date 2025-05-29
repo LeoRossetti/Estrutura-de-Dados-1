@@ -5,50 +5,55 @@
 #define MAX 100
 
 typedef struct {
-    int id;
-} Cliente;
-
-typedef struct {
-    Cliente fila[MAX];
-    int inicio, fim, tamanho;
+    int itens[MAX];
+    int frente, tras, tamanho;
 } Fila;
 
-void inicializar(Fila *f) {
-    f->inicio = 0;
-    f->fim = -1;
+void inicializarFila(Fila *f) {
+    f->frente = 0;
+    f->tras = -1;
     f->tamanho = 0;
 }
 
-void enfileirar(Fila *f, int id) {
-    if (f->tamanho == MAX) {
+int estaVazia(Fila *f) {
+    return (f->tamanho == 0);
+}
+
+int estaCheia(Fila *f) {
+    return (f->tamanho == MAX);
+}
+
+void enqueue(Fila *f, int valor) {
+    if (estaCheia(f)) {
         printf("Fila cheia!\n");
         return;
     }
-    f->fim = (f->fim + 1) % MAX;
-    f->fila[f->fim].id = id;
+    f->tras = (f->tras + 1) % MAX;
+    f->itens[f->tras] = valor;
     f->tamanho++;
-    printf("Cliente %d entrou na fila.\n", id);
+    printf("Cliente %d entrou na fila.\n", valor);
 }
 
-void desenfileirar(Fila *f) {
-    if (f->tamanho == 0) {
+int dequeue(Fila *f) {
+    if (estaVazia(f)) {
         printf("Nenhum cliente na fila.\n");
-        return;
+        return -1;
     }
-    Cliente *c = &f->fila[f->inicio];
-    printf("Cliente %d foi atendido.\n", c->id);
-    f->inicio = (f->inicio + 1) % MAX;
+    int valor = f->itens[f->frente];
+    f->frente = (f->frente + 1) % MAX;
     f->tamanho--;
+    printf("Cliente %d foi atendido.\n", valor);
+    return valor;
 }
 
-void mostrar_fila(Fila *f) {
-    if (f->tamanho == 0) {
+void mostrarFila(Fila *f) {
+    if (estaVazia(f)) {
         printf("A fila está vazia.\n");
         return;
     }
     printf("Fila: ");
-    for (int i = 0, idx = f->inicio; i < f->tamanho; i++, idx = (idx + 1) % MAX) {
-        printf("%d ", f->fila[idx].id);
+    for (int i = 0, idx = f->frente; i < f->tamanho; i++, idx = (idx + 1) % MAX) {
+        printf("%d ", f->itens[idx]);
     }
     printf("\n");
 }
@@ -56,14 +61,14 @@ void mostrar_fila(Fila *f) {
 int main() {
     srand(time(NULL));
     Fila fila;
-    inicializar(&fila);
+    inicializarFila(&fila);
     int tempo_simulacao = 20, tempo_atual = 0, ultimo_cliente = 0;
     while (tempo_atual < tempo_simulacao) {
         if (rand() % 10 < 3) {
-            enfileirar(&fila, ++ultimo_cliente);
+            enqueue(&fila, ++ultimo_cliente);
         }
         if (rand() % 10 < 5) {
-            desenfileirar(&fila);
+            dequeue(&fila);
         }
         tempo_atual++;
     }

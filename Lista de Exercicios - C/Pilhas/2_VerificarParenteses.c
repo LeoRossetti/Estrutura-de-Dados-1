@@ -1,26 +1,51 @@
 #include <stdio.h>
 #include <string.h>
-
 #define MAX 100
 
+typedef struct {
+    char itens[MAX];
+    int topo;
+} PilhaChar;
+
+void inicializarPilha(PilhaChar *p) {
+    p->topo = -1;
+}
+
+int estaVazia(PilhaChar *p) {
+    return (p->topo == -1);
+}
+
+int estaCheia(PilhaChar *p) {
+    return (p->topo == MAX - 1);
+}
+
+void push(PilhaChar *p, char valor) {
+    if (estaCheia(p)) return;
+    p->itens[++p->topo] = valor;
+}
+
+char pop(PilhaChar *p) {
+    if (estaVazia(p)) return '\0';
+    return p->itens[p->topo--];
+}
+
 int verifica_balanceamento(const char *expressao) {
-    char pilha[MAX];
-    int topo = -1;
+    PilhaChar pilha;
+    inicializarPilha(&pilha);
     for (int i = 0; expressao[i] != '\0'; i++) {
         char c = expressao[i];
         if (c == '(' || c == '[' || c == '{') {
-            pilha[++topo] = c;
+            push(&pilha, c);
         } else if (c == ')' || c == ']' || c == '}') {
-            if (topo < 0) return 0;
-            char topo_pilha = pilha[topo--];
-            if ((c == ')' && topo_pilha != '(') ||
-                (c == ']' && topo_pilha != '[') ||
-                (c == '}' && topo_pilha != '{')) {
+            char topo = pop(&pilha);
+            if ((c == ')' && topo != '(') ||
+                (c == ']' && topo != '[') ||
+                (c == '}' && topo != '{')) {
                 return 0;
             }
         }
     }
-    return topo == -1;
+    return estaVazia(&pilha);
 }
 
 int main() {
